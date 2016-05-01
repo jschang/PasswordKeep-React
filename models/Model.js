@@ -10,6 +10,19 @@ module.exports = redux.createStore(
         if(!state) return require('./Css.js')
         return state;
       },
+      storeStatus:function(state,action) {
+        if(!state) return {
+          created:null
+        }
+        var ret = state;
+        if(action.type=='STORE_UNCREATED') {
+          ret = Object.assign({},state,{created:false});
+        }
+        if(action.type=='STORE_CREATED') {
+          ret = Object.assign({},state,{created:true});
+        }
+        return ret;
+      },
       /**
        * { type: SET_STORE_PASSWORD, value: 'somevalue' }
        */
@@ -17,12 +30,13 @@ module.exports = redux.createStore(
         util.log(TAG+'.key','state=',state,', action=',action)
         if(!state) return {value:null,accepted:false};
         var ret = state;
-        if(action.type=='SET_STORE_PASSWORD')
+        if(action.type=='SET_STORE_PASSWORD') {
           ret = Object.assign({},state,{value:action.value});
-        if(action.type=='STORE_PASSWORD_ACCEPTED')
+        } else if(action.type=='STORE_PASSWORD_ACCEPTED') {
           ret = Object.assign({},state,{accepted:true});
-        if(action.type=='STORE_PASSWORD_REJECTED')
+        } else if(action.type=='STORE_PASSWORD_REJECTED') {
           ret = Object.assign({},state,{accepted:false});
+        }
         util.log(TAG+'.key','new state=',ret)
         return ret;
       },
@@ -35,8 +49,7 @@ module.exports = redux.createStore(
         var ret = state;
         if(action.type=='SERVICE_MESSAGE') {
           ret = action.message;
-        }
-        if(action.type=='CLEAR_SERVICE_MESSAGE') {
+        } else if(action.type=='CLEAR_SERVICE_MESSAGE') {
           ret = '';
         }
         return ret;
@@ -47,8 +60,9 @@ module.exports = redux.createStore(
       filter:function(state, action) {
         util.log(TAG+'.filter','state=',state,', action=',action);
         if(!state) return 'url';
-        if(action.type=='SET_FILTER')
+        if(action.type=='SET_FILTER') {
           return action.value;
+        }
         return state;
       },
       entry:function(state, action) {
@@ -56,8 +70,7 @@ module.exports = redux.createStore(
         if(!state) return {entry:null,index:null};
         if(action.type=='SET_ENTRY') {
           return {entry:action.entry,index:action.index};
-        }
-        if(action.type=='CLEAR_ENTRY') {
+        } else if(action.type=='CLEAR_ENTRY') {
           return {entry:null,index:null};
         }
         return state;
@@ -74,12 +87,10 @@ module.exports = redux.createStore(
         if(action.type=='CLEAR_ENTRIES') {
           var ret = [];
           return ret;
-        }
-        if(action.type=='ADD_ENTRIES') {
+        } else if(action.type=='ADD_ENTRIES') {
           var ret = action.entries;
           return ret;
-        }
-        if(action.type=='NEW_ENTRY') {
+        } else if(action.type=='NEW_ENTRY') {
           var ret = [];
           Array.prototype.push.apply(ret,state);
           ret.push({
@@ -89,17 +100,14 @@ module.exports = redux.createStore(
             'url':null
           })
           return ret;
-        }
-        if(action.type=='SAVE_ENTRY') {
+        } else if(action.type=='SAVE_ENTRY') {
 
-        }
-        if(action.type=='REMOVE_ENTRY') {
+        } else if(action.type=='REMOVE_ENTRY') {
           var ret = [];
           Array.prototype.push.apply(ret,state);
           ret.splice(action.index,1)
           return ret;
-        }
-        if(action.type=='EDIT_ENTRY') {
+        } else if(action.type=='EDIT_ENTRY') {
           var ret = [];
           Array.prototype.push.apply(ret,state);
           ret[action.index] = action.entry;

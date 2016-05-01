@@ -4,7 +4,12 @@ const ReactRedux = require('react-redux');
 const Redux = require('redux');
 const util = require('../util.js');
 
-import TextField from 'material-ui/lib/text-field';
+import Grid from 'react-bootstrap/lib/Grid';
+import Row from 'react-bootstrap/lib/Row';
+import Col from 'react-bootstrap/lib/Col';
+import Form from 'react-bootstrap/lib/Form';
+import FormGroup from 'react-bootstrap/lib/FormGroup';
+import FormControl from 'react-bootstrap/lib/FormControl';
 
 const Model = require('../models/Model.js');
 const TAG = 'components.CredentialsKeyForm';
@@ -20,12 +25,24 @@ class CredentialsKeyForm extends React.Component {
   }
   render() {
     util.log(TAG,'render: props=',this.props,' state=',this.state)
-    return (<TextField
-      floatingLabelText="Credentials Store Key"
-      style={Model.getState().css.key}
-      id="storePasswordInput"
-      type="password"
-      onKeyUp={this.onKeyUp.bind(this)}/>)
+    return (
+      <Grid>
+        <br/><br/><br/>
+        <Row>
+          <Col xs={6} xsOffset={3}>
+            <Form inline onSubmit={(evt)=>{evt.preventDefault()}}>
+              <FormGroup style={{width:'100%'}} bsSize='lg'>
+                <FormControl style={{width:'100%'}}
+                  componentClass='input'
+                  placeholder='Password'
+                  type='password'
+                  onKeyUp={this.onKeyUp.bind(this)} />
+              </FormGroup>
+            </Form>
+          </Col>
+        </Row>
+      </Grid>
+      )
   }
 }
 

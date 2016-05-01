@@ -8,13 +8,25 @@ var injectTapEventPlugin = require('react-tap-event-plugin');
 injectTapEventPlugin();
 
 // derp
-var React = require('react');
-var ReactDOM = require('react-dom');
-var ReactRedux = require('react-redux');
+const React = require('react');
+const ReactDOM = require('react-dom');
+const ReactRedux = require('react-redux');
 
-var PasswordAppForm = require('./components/PasswordAppForm.js')
-var PasswordStore = require('./models/Model.js')
-require('./requests/SetStorePassword.js')
+const PasswordAppForm = require('./components/PasswordAppForm.js')
+const PasswordStore = require('./models/Model.js')
+
+const fetchStore = require('./requests/FetchStore.js')
+
+// whenever the key store changes,
+// attempt to refetch the entries
+var lastKeyValue = '';
+PasswordStore.subscribe(()=>{
+  const state = PasswordStore.getState();
+  if(state.key.value!=lastKeyValue) {
+    lastKeyValue = state.key.value;
+    fetchStore(lastKeyValue);
+  }
+})
 
 ReactDOM.render(
   <ReactRedux.Provider store={PasswordStore}>

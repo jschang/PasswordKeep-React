@@ -13,22 +13,22 @@ require('../php/Cryptastic.php');
 require('../php/Credential.php');
 require('../php/PasswordManager.php');
 
-error_log(json_encode($_POST));
+error_log('request: '.json_encode($_POST));
 $response = new stdClass();
 try {
-  if(empty($_POST['action'])) {
+  if (empty($_POST['action'])) {
     throw new Exception("Action is required.  Contact technical support.  This should never happen.");
-  } else if($_POST['action']=='fetch') {
-    $mgr = new PasswordManager($_POST['password']);
-    if($mgr->open()) {
-      $response->entries = $mgr->getCredentials();
-    } else {
-      throw new Exception("Invalid password or corrupt store xml.");
-    }
+  } elseif ($_POST['action']=='fetch') {
+    require('../php/controller/fetch.php');
+  } elseif ($_POST['action']=='create') {
+    require('../php/controller/create.php');
+  } elseif ($_POST['action']=='save') {
+    require('../php/controller/save.php');
   }
 } catch(Exception $e) {
   $response->error = true;
   $response->message = $e->getMessage();
 }
-
-echo json_encode($response);
+$response = json_encode($response);
+error_log('response: '.$response);
+echo $response;

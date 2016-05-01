@@ -24,10 +24,11 @@ class PasswordManager {
 	public function create($overwrite=false) {
 	  if($this->open()===null || $overwrite) {
       $dom = new DOMDocument();
-      $dom->loadXml("<?xml version=\"1.0\"?><credentials/>");
+      $dom->loadXml('<?xml version="1.0"?><credentials></credentials>');
       $enc = $dom->saveXML();
-      file_put_contents(PKR_CREDENTIALS_PATH,$this->encrypt($enc));
+      return file_put_contents(PKR_CREDENTIALS_PATH,$this->encrypt($enc))!==false;
     }
+    return false;
 	}
 	
 	/**
