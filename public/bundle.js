@@ -19,8 +19,10 @@ require("babel-polyfill");
 var React = require('react');
 var ReactRedux = require('react-redux');
 var Redux = require('redux');
+var util = require('../util.js');
 
 var Model = require('../models/Model.js');
+var TAG = 'components.CredentialsKeyForm';
 
 var CredentialsKeyForm = (function (_React$Component) {
   _inherits(CredentialsKeyForm, _React$Component);
@@ -37,15 +39,22 @@ var CredentialsKeyForm = (function (_React$Component) {
       this.defaultProps = { value: '' };
     }
   }, {
+    key: 'onKeyUp',
+    value: function onKeyUp(evt) {
+      if (evt.keyCode == 13) {
+        this.props.onEnterPressed(evt);
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
-      console.log('in render: props=', this.props, ' state=', this.state);
+      util.log(TAG, 'render: props=', this.props, ' state=', this.state);
       return React.createElement(_materialUiLibTextField2['default'], {
         floatingLabelText: 'Credentials Store Key',
         style: Model.getState().css.key,
         id: 'storePasswordInput',
         type: 'password',
-        onKeyUp: this.props.onKeyUp });
+        onKeyUp: this.onKeyUp.bind(this) });
     }
   }]);
 
@@ -55,24 +64,21 @@ var CredentialsKeyForm = (function (_React$Component) {
 CredentialsKeyForm = ReactRedux.connect(
 // map redux state to props
 function (state, props) {
-  console.log('CredentialsKeyForm: ', state, props);
+  util.log(TAG, 'mapStateToProps: state=', state, ', props=', props);
   return { value: state.key.value };
 }, {
   // map dispatchable events to props
-  onKeyUp: function onKeyUp(evt) {
-    if (evt.keyCode == 13) {
-      return {
-        type: 'SET_STORE_PASSWORD',
-        value: evt.target.value
-      };
-    }
-    return { type: null };
+  onEnterPressed: function onEnterPressed(evt) {
+    return {
+      type: 'SET_STORE_PASSWORD',
+      value: evt.target.value
+    };
   }
 })(CredentialsKeyForm);
 
 module.exports = CredentialsKeyForm;
 
-},{"../models/Model.js":8,"babel-polyfill":9,"material-ui/lib/text-field":362,"react":598,"react-redux":425,"redux":604}],2:[function(require,module,exports){
+},{"../models/Model.js":8,"../util.js":609,"babel-polyfill":9,"material-ui/lib/text-field":362,"react":598,"react-redux":425,"redux":604}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -86,12 +92,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 require("babel-polyfill");
 var React = require('react');
 var ReactRedux = require('react-redux');
+var util = require('../util.js');
 
 var Model = require('../models/Model.js');
 
 var PasswordEntryForm = require('./PasswordEntryForm.js');
 var CredentialsKeyForm = require('./CredentialsKeyForm.js');
 var PasswordEntryListControllerForm = require('./PasswordEntryListControllerForm.js');
+
+var TAG = 'components.PasswordAppForm';
 
 var PasswordAppForm = (function (_React$Component) {
   _inherits(PasswordAppForm, _React$Component);
@@ -110,8 +119,8 @@ var PasswordAppForm = (function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      console.log('PasswordAppForm.render: props=', this.props, ' state=', this.state);
-      if (this.props.secretKey) {
+      util.log(TAG, 'render: props=', this.props, ' state=', this.state);
+      if (this.props.secretKeyAccepted) {
         if (this.props.entry.entry) {
           return React.createElement(PasswordEntryForm, { entry: this.props.entry.entry, entryIndex: this.props.entry.index });
         } else {
@@ -129,17 +138,17 @@ var PasswordAppForm = (function (_React$Component) {
 PasswordAppForm = ReactRedux.connect(
 // map redux state to props
 function (state, props) {
-  console.log('PasswordAppForm.mapStateToProps: ', state, props);
   return {
     entry: state.entry,
     entries: state.entries,
-    secretKey: state.key.value
+    secretKey: state.key.value,
+    secretKeyAccepted: state.key.accepted
   };
 })(PasswordAppForm);
 
 module.exports = PasswordAppForm;
 
-},{"../models/Model.js":8,"./CredentialsKeyForm.js":1,"./PasswordEntryForm.js":3,"./PasswordEntryListControllerForm.js":4,"babel-polyfill":9,"react":598,"react-redux":425}],3:[function(require,module,exports){
+},{"../models/Model.js":8,"../util.js":609,"./CredentialsKeyForm.js":1,"./PasswordEntryForm.js":3,"./PasswordEntryListControllerForm.js":4,"babel-polyfill":9,"react":598,"react-redux":425}],3:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -172,8 +181,11 @@ require("babel-polyfill");
 var React = require('react');
 var ReactRedux = require('react-redux');
 var Redux = require('redux');
+var util = require('../util.js');
 
 var Model = require('../models/Model.js');
+
+var TAG = 'components.PasswordEntryForm';
 
 var PasswordEntryForm = (function (_React$Component) {
   _inherits(PasswordEntryForm, _React$Component);
@@ -195,7 +207,7 @@ var PasswordEntryForm = (function (_React$Component) {
   }, {
     key: 'onChangeUrl',
     value: function onChangeUrl(evt) {
-      console.log('onChangeUrl.value= ', evt.target.value);
+      util.log(TAG, 'onChangeUrl.value= ', evt.target.value);
       this.setState({ entry: Object.assign({}, this.state.entry, {
           url: evt.target.value
         }) });
@@ -203,7 +215,7 @@ var PasswordEntryForm = (function (_React$Component) {
   }, {
     key: 'onChangeDescription',
     value: function onChangeDescription(evt) {
-      console.log('onChangeDescription.value= ', evt.target.value);
+      util.log(TAG, 'onChangeDescription.value= ', evt.target.value);
       this.setState({ entry: Object.assign({}, this.state.entry, {
           description: evt.target.value
         }) });
@@ -211,7 +223,7 @@ var PasswordEntryForm = (function (_React$Component) {
   }, {
     key: 'onChangeUsername',
     value: function onChangeUsername(evt) {
-      console.log('onChangeUsername.value= ', evt.target.value);
+      util.log(TAG, 'onChangeUsername.value= ', evt.target.value);
       this.setState({ entry: Object.assign({}, this.state.entry, {
           username: evt.target.value
         }) });
@@ -219,7 +231,7 @@ var PasswordEntryForm = (function (_React$Component) {
   }, {
     key: 'onChangePassword',
     value: function onChangePassword(evt) {
-      console.log('onChangePassword.value= ', evt.target.value);
+      util.log(TAG, 'onChangePassword.value= ', evt.target.value);
       this.setState({ entry: Object.assign({}, this.state.entry, {
           password: evt.target.value
         }) });
@@ -227,7 +239,7 @@ var PasswordEntryForm = (function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      console.log('PasswordEntryForm.render: props=', this.props, ' state=', this.state);
+      util.log(TAG, 'render: props=', this.props, ' state=', this.state);
       var state = this.state;
       return React.createElement(
         'div',
@@ -236,9 +248,9 @@ var PasswordEntryForm = (function (_React$Component) {
           'div',
           null,
           React.createElement(_materialUiLibFlatButton2['default'], { style: Model.getState().css.entryBackButton,
-            label: 'Back', onTouchStart: this.props.onBackTouched }),
+            label: 'Back', onClick: this.props.onBackTouched }),
           React.createElement(_materialUiLibFlatButton2['default'], { style: Model.getState().css.entrySaveButton,
-            label: 'Save', onTouchStart: this.onSaveTouched })
+            label: 'Save', onClick: this.onSaveTouched })
         ),
         React.createElement(_materialUiLibTextField2['default'], {
           floatingLabelText: 'URL',
@@ -284,13 +296,14 @@ function (state, props) {
   };
 }, {
   onBackTouched: function onBackTouched() {
+    util.log(TAG, 'back touched');
     return { type: 'CLEAR_ENTRY' };
   }
 })(PasswordEntryForm);
 
 module.exports = PasswordEntryForm;
 
-},{"../models/Model.js":8,"babel-polyfill":9,"material-ui/lib/flat-button":325,"material-ui/lib/lists/list":329,"material-ui/lib/lists/list-item":328,"material-ui/lib/text-field":362,"react":598,"react-redux":425,"redux":604}],4:[function(require,module,exports){
+},{"../models/Model.js":8,"../util.js":609,"babel-polyfill":9,"material-ui/lib/flat-button":325,"material-ui/lib/lists/list":329,"material-ui/lib/lists/list-item":328,"material-ui/lib/text-field":362,"react":598,"react-redux":425,"redux":604}],4:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -319,9 +332,12 @@ require("babel-polyfill");
 var React = require('react');
 var ReactRedux = require('react-redux');
 var Redux = require('redux');
+var util = require('../util.js');
 
 var Model = require('../models/Model.js');
 var PasswordEntryListForm = require('./PasswordEntryListForm.js');
+
+var TAG = 'components.PasswordEntryListControllerForm';
 
 var PasswordEntryListControllerForm = (function (_React$Component) {
   _inherits(PasswordEntryListControllerForm, _React$Component);
@@ -341,19 +357,19 @@ var PasswordEntryListControllerForm = (function (_React$Component) {
   }, {
     key: 'searchFieldChange',
     value: function searchFieldChange(evt, index, value) {
-      console.log(evt, index, value);
+      util.log(TAG, evt, index, value);
       this.setState({ searchField: value });
     }
   }, {
     key: 'searchValueChange',
     value: function searchValueChange(evt, index, value) {
-      console.log(evt, index, value);
+      util.log(TAG, evt, index, value);
       this.setState({ searchValue: evt.target.value });
     }
   }, {
     key: 'render',
     value: function render() {
-      console.log('PasswordEntryListControllerForm.render: props=', this.props, ' state=', this.state);
+      util.log(TAG, 'render: props=', this.props, ' state=', this.state);
       return React.createElement(
         'div',
         { style: Model.getState().css.centerDiv },
@@ -389,7 +405,7 @@ function (state, props) {
 
 module.exports = PasswordEntryListControllerForm;
 
-},{"../models/Model.js":8,"./PasswordEntryListForm.js":5,"babel-polyfill":9,"material-ui/lib/menus/menu-item":331,"material-ui/lib/select-field":345,"material-ui/lib/text-field":362,"react":598,"react-redux":425,"redux":604}],5:[function(require,module,exports){
+},{"../models/Model.js":8,"../util.js":609,"./PasswordEntryListForm.js":5,"babel-polyfill":9,"material-ui/lib/menus/menu-item":331,"material-ui/lib/select-field":345,"material-ui/lib/text-field":362,"react":598,"react-redux":425,"redux":604}],5:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -414,8 +430,11 @@ require("babel-polyfill");
 var React = require('react');
 var ReactRedux = require('react-redux');
 var Redux = require('redux');
+var util = require('../util.js');
 
 var Model = require('../models/Model.js');
+
+var TAG = 'components.PasswordEntryListForm';
 
 var PasswordEntryListForm = (function (_React$Component) {
   _inherits(PasswordEntryListForm, _React$Component);
@@ -435,14 +454,14 @@ var PasswordEntryListForm = (function (_React$Component) {
   }, {
     key: 'handleUpdateSelectedIndex',
     value: function handleUpdateSelectedIndex(e, index) {
-      console.log('PasswordEntryListForm.handleUpdateSelectedIndex: ', e, index);
+      util.log(TAG, 'handleUpdateSelectedIndex: ', e, index);
       var entry = Object.assign({}, Model.getState().entries[index]);
       Model.dispatch({ type: 'SET_ENTRY', 'entry': Object.assign({}, entry), 'index': index });
     }
   }, {
     key: 'render',
     value: function render() {
-      console.log('PasswordEntryListForm.render: props=', this.props, ' state=', this.state);
+      util.log(TAG, 'render: props=', this.props, ' state=', this.state);
 
       var list = [];
       var props = this.props;
@@ -476,12 +495,13 @@ var PasswordEntryListForm = (function (_React$Component) {
 PasswordEntryListForm = ReactRedux.connect(
 // map redux state to props
 function (state, props) {
+  //util.log(TAG,'mapStateToProps: props=',this.props,' state=',this.state)
   return { entries: state.entries };
 })(PasswordEntryListForm);
 
 module.exports = PasswordEntryListForm;
 
-},{"../models/Model.js":8,"babel-polyfill":9,"material-ui/lib/lists/list":329,"material-ui/lib/lists/list-item":328,"react":598,"react-redux":425,"redux":604}],6:[function(require,module,exports){
+},{"../models/Model.js":8,"../util.js":609,"babel-polyfill":9,"material-ui/lib/lists/list":329,"material-ui/lib/lists/list-item":328,"react":598,"react-redux":425,"redux":604}],6:[function(require,module,exports){
 // for ecmascript 5
 'use strict';
 
@@ -511,7 +531,7 @@ ReactDOM.render(React.createElement(
     entries: PasswordStore.getState().entries })
 ), document.getElementById('password-app'));
 
-},{"./components/PasswordAppForm.js":2,"./models/Model.js":8,"./requests/SetStorePassword.js":612,"babel-polyfill":9,"lodash":310,"react":598,"react-dom":422,"react-redux":425,"react-tap-event-plugin":436}],7:[function(require,module,exports){
+},{"./components/PasswordAppForm.js":2,"./models/Model.js":8,"./requests/SetStorePassword.js":608,"babel-polyfill":9,"lodash":310,"react":598,"react-dom":422,"react-redux":425,"react-tap-event-plugin":436}],7:[function(require,module,exports){
 'use strict';
 
 var fontSize = '16pt';
@@ -580,7 +600,10 @@ module.exports = {
 },{}],8:[function(require,module,exports){
 'use strict';
 
+var util = require('../util.js');
 var redux = require('redux');
+
+var TAG = 'models.Model';
 
 module.exports = redux.createStore(redux.combineReducers({
   css: function css(state, action) {
@@ -591,18 +614,19 @@ module.exports = redux.createStore(redux.combineReducers({
    * { type: SET_STORE_PASSWORD, value: 'somevalue' }
    */
   key: function key(state, action) {
-    console.log('model.key: state=', state, ', action=', action);
-    if (!state) return { value: null };
+    util.log(TAG + '.key', 'state=', state, ', action=', action);
+    if (!state) return { value: null, accepted: false };
     var ret = state;
     if (action.type == 'SET_STORE_PASSWORD') ret = Object.assign({}, state, { value: action.value });
-    console.log('model.key: new state=', ret);
+    if (action.type == 'STORE_PASSWORD_ACCEPTED') ret = Object.assign({}, state, { accepted: true });
+    util.log(TAG + '.key', 'new state=', ret);
     return ret;
   },
-  /*
+  /**
    * { type: SERVICE_MESSAGE, message: 'message to display' }
    */
   serviceMessage: function serviceMessage(state, action) {
-    console.log('model.serviceMessage: state=', state, ', action=', action);
+    util.log(TAG + '.serviceMessage', 'state=', state, ', action=', action);
     if (!state) return '';
     var ret = state;
     if (action.type == 'SERVICE_MESSAGE') ret = action.message;
@@ -612,13 +636,13 @@ module.exports = redux.createStore(redux.combineReducers({
    * { type: SET_FILTER, value: 'somevalue' }
    */
   filter: function filter(state, action) {
-    console.log('model.filter: state=', state, ', action=', action);
+    util.log(TAG + '.filter', 'state=', state, ', action=', action);
     if (!state) return '';
     if (action.type == 'SET_FILTER') return action.value;
     return state;
   },
   entry: function entry(state, action) {
-    console.log('model.entry: state=', state, ', action=', action);
+    util.log(TAG + '.entry', 'state=', state, ', action=', action);
     if (!state) return { entry: null, index: null };
     if (action.type == 'SET_ENTRY') {
       return { entry: action.entry, index: action.index };
@@ -635,7 +659,7 @@ module.exports = redux.createStore(redux.combineReducers({
    * { type: EDIT_ENTRY, index: 2, entry: {username:null,password:null,description:null,url:null} }
    */
   entries: function entries(state, action) {
-    console.log('model.entries: state=', state, ', action=', action);
+    util.log(TAG + '.entries', 'state=', state, ', action=', action);
     if (!state) return [];
     if (action.type == 'CLEAR_ENTRIES') {
       var ret = [];
@@ -673,7 +697,7 @@ module.exports = redux.createStore(redux.combineReducers({
   }
 }));
 
-},{"./Css.js":7,"redux":604}],9:[function(require,module,exports){
+},{"../util.js":609,"./Css.js":7,"redux":604}],9:[function(require,module,exports){
 (function (global){
 /* eslint max-len: 0 */
 
@@ -57910,7 +57934,7 @@ function combineReducers(reducers) {
   };
 }
 }).call(this,require('_process'))
-},{"./createStore":603,"./utils/warning":605,"_process":305,"lodash/isPlainObject":609}],602:[function(require,module,exports){
+},{"./createStore":603,"./utils/warning":605,"_process":305,"lodash/isPlainObject":309}],602:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -58214,7 +58238,7 @@ function createStore(reducer, initialState, enhancer) {
     replaceReducer: replaceReducer
   }, _ref2[_symbolObservable2["default"]] = observable, _ref2;
 }
-},{"lodash/isPlainObject":609,"symbol-observable":610}],604:[function(require,module,exports){
+},{"lodash/isPlainObject":309,"symbol-observable":606}],604:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -58290,14 +58314,6 @@ function warning(message) {
   /* eslint-enable no-empty */
 }
 },{}],606:[function(require,module,exports){
-arguments[4][306][0].apply(exports,arguments)
-},{"dup":306}],607:[function(require,module,exports){
-arguments[4][307][0].apply(exports,arguments)
-},{"dup":307}],608:[function(require,module,exports){
-arguments[4][308][0].apply(exports,arguments)
-},{"dup":308}],609:[function(require,module,exports){
-arguments[4][309][0].apply(exports,arguments)
-},{"./_getPrototype":606,"./_isHostObject":607,"./isObjectLike":608,"dup":309}],610:[function(require,module,exports){
 (function (global){
 /* global window */
 'use strict';
@@ -58305,7 +58321,7 @@ arguments[4][309][0].apply(exports,arguments)
 module.exports = require('./ponyfill')(global || window || this);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./ponyfill":611}],611:[function(require,module,exports){
+},{"./ponyfill":607}],607:[function(require,module,exports){
 'use strict';
 
 module.exports = function symbolObservablePonyfill(root) {
@@ -58326,10 +58342,13 @@ module.exports = function symbolObservablePonyfill(root) {
 	return result;
 };
 
-},{}],612:[function(require,module,exports){
+},{}],608:[function(require,module,exports){
 'use strict';
 
 var Model = require('../models/Model.js');
+var util = require('../util.js');
+
+var TAG = 'requests.SetStorePassword';
 
 var lastKeyValue = '';
 Model.subscribe(function () {
@@ -58348,10 +58367,15 @@ Model.subscribe(function () {
       },
       success: function success(data, textState, xhr) {
         var Model = require('../models/Model.js');
+        util.log(TAG, 'response=', data);
         if (!data) {
           Model.dispatch({
             type: 'SERVICE_MESSAGE',
             message: "Unable to retrieve JSON from the server"
+          });
+          Model.dispatch({
+            type: 'SET_STORE_PASSWORD',
+            value: null
           });
           return;
         }
@@ -58360,7 +58384,14 @@ Model.subscribe(function () {
             type: 'SERVICE_MESSAGE',
             message: data.message
           });
+          Model.dispatch({
+            type: 'SET_STORE_PASSWORD',
+            value: null
+          });
         } else if (data.entries.length) {
+          Model.dispatch({
+            type: 'STORE_PASSWORD_ACCEPTED'
+          });
           Model.dispatch({
             type: 'ADD_ENTRIES',
             entries: data.entries
@@ -58371,4 +58402,13 @@ Model.subscribe(function () {
   }
 });
 
-},{"../models/Model.js":8}]},{},[6]);
+},{"../models/Model.js":8,"../util.js":609}],609:[function(require,module,exports){
+"use strict";
+
+module.exports = {
+  log: function log() {
+    console.log.apply(console, arguments);
+  }
+};
+
+},{}]},{},[6]);

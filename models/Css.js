@@ -1,4 +1,4 @@
-var fontSize = '16pt';
+const fontSize = '16pt';
 
 module.exports = {
 

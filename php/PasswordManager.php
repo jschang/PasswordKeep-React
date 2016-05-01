@@ -21,18 +21,29 @@ class PasswordManager {
 		return $this->crypter->decrypt($str,$this->cryptasticKey,true);
 	}
 
+	public function create($overwrite=false) {
+	  if($this->open()===null || $overwrite) {
+      $dom = new DOMDocument();
+      $dom->loadXml("<?xml version=\"1.0\"?><credentials/>");
+      $enc = $dom->saveXML();
+      file_put_contents(PKR_CREDENTIALS_PATH,$this->encrypt($enc));
+    }
+	}
+	
+	/**
+	 * @return null if dne, true on success, false on bad key
+	 */
 	public function open() {
 		$key = $this->key;
-		if( file_exists(KEY_STORE) ) {
-			$rawXml = $this->decrypt(file_get_contents(KEY_STORE));
+		if( file_exists(PKR_CREDENTIALS_PATH) ) {
+			$rawXml = $this->decrypt(file_get_contents(PKR_CREDENTIALS_PATH));
 			if( strpos($rawXml,"credentials")===false ) {
 				return false;
 			}
 			$dom = new DOMDocument();
 			$dom->loadXml($rawXml);
 		} else {
-			$dom = new DOMDocument();
-			$dom->loadXml("<?xml version=\"1.0\"?><credentials/>");
+			return null;
 		}
 		$credentials = $dom->getElementsByTagName("credential");
 		if( $credentials instanceof DOMNodeList && $credentials->length>0 ) {
@@ -61,18 +72,18 @@ class PasswordManager {
 			$creds->appendChild($cred);
 		}
 		$enc = $dom->saveXML();
-		file_put_contents(KEY_STORE,$this->encrypt($enc));
+		file_put_contents(PKR_CREDENTIALS_PATH,$this->encrypt($enc));
 	}
 
 	private function initKey() {
-		$this->cryptasticKey = $this->crypter->pbkdf2($this->key,SALT,2353,32);
+		$this->cryptasticKey = $this->crypter->pbkdf2($this->key,PKR_SALT,2353,32);
 	}
 
 	public function setKey($key) {
 		$this->key = $key;
 	}
 	private function getKeyValue() {
-		return pack('H*',sha1($this->key.SALT));
+		return pack('H*',sha1($this->key.PKR_SALT));
 	}
 
 	public function getCredentials() {

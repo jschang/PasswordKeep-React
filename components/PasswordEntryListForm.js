@@ -1,12 +1,15 @@
 require("babel-polyfill");
-var React = require('react');
-var ReactRedux = require('react-redux');
-var Redux = require('redux');
+const React = require('react');
+const ReactRedux = require('react-redux');
+const Redux = require('redux');
+const util = require('../util.js');
 
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
 
-var Model = require('../models/Model.js');
+const Model = require('../models/Model.js');
+
+const TAG = 'components.PasswordEntryListForm';
 
 class PasswordEntryListForm extends React.Component {
   componentWillMount() {
@@ -15,13 +18,13 @@ class PasswordEntryListForm extends React.Component {
   }
 
   handleUpdateSelectedIndex(e,index) {
-    console.log('PasswordEntryListForm.handleUpdateSelectedIndex: ',e,index)
+    util.log(TAG,'handleUpdateSelectedIndex: ',e,index)
     var entry = Object.assign({},Model.getState().entries[index]);
     Model.dispatch({type:'SET_ENTRY','entry':Object.assign({},entry),'index':index});
   }
 
   render() {
-    console.log('PasswordEntryListForm.render: props=',this.props,' state=',this.state)
+    util.log(TAG,'render: props=',this.props,' state=',this.state)
 
     var list = [];
     var props = this.props;
@@ -48,6 +51,7 @@ class PasswordEntryListForm extends React.Component {
 PasswordEntryListForm = ReactRedux.connect(
 // map redux state to props
 (state,props) => {
+  //util.log(TAG,'mapStateToProps: props=',this.props,' state=',this.state)
   return {entries:state.entries};
 })(PasswordEntryListForm);
 

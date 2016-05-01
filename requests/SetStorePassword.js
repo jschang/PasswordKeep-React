@@ -1,8 +1,11 @@
-var Model = require('../models/Model.js')
+const Model = require('../models/Model.js')
+const util = require('../util.js')
+
+const TAG = 'requests.SetStorePassword';
 
 var lastKeyValue = '';
 Model.subscribe(()=>{
-  var state = Model.getState();
+  const state = Model.getState();
   if(state.key.value!=lastKeyValue) {
     lastKeyValue = state.key.value;
     Model.dispatch({
@@ -16,11 +19,16 @@ Model.subscribe(()=>{
         password:lastKeyValue
       },
       success:(data,textState,xhr) => {
-        var Model = require('../models/Model.js')
+        const Model = require('../models/Model.js')
+        util.log(TAG,'response=',data);
         if(!data) {
           Model.dispatch({
             type:'SERVICE_MESSAGE',
             message:"Unable to retrieve JSON from the server"
+          })
+          Model.dispatch({
+            type:'SET_STORE_PASSWORD',
+            value:null
           })
           return;
         }
@@ -29,7 +37,14 @@ Model.subscribe(()=>{
             type:'SERVICE_MESSAGE',
             message:data.message
           })
+          Model.dispatch({
+            type:'SET_STORE_PASSWORD',
+            value:null
+          })
         } else if(data.entries.length) {
+          Model.dispatch({
+            type:'STORE_PASSWORD_ACCEPTED'
+          })
           Model.dispatch({
             type:'ADD_ENTRIES',
             entries:data.entries

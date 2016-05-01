@@ -1,14 +1,17 @@
 require("babel-polyfill");
-var React = require('react');
-var ReactRedux = require('react-redux');
-var Redux = require('redux');
+const React = require('react');
+const ReactRedux = require('react-redux');
+const Redux = require('redux');
+const util = require('../util.js');
+
+const Model = require('../models/Model.js');
 
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
-
-var Model = require('../models/Model.js');
 import TextField from 'material-ui/lib/text-field';
 import FlatButton from 'material-ui/lib/flat-button';
+
+const TAG = 'components.PasswordEntryForm';
 
 class PasswordEntryForm extends React.Component {
   constructor(props) {
@@ -21,38 +24,38 @@ class PasswordEntryForm extends React.Component {
     Model.dispatch({type:'SAVE_ENTRY',entry:newEntry,index:this.props.entryIndex});
   }
   onChangeUrl(evt) {
-    console.log('onChangeUrl.value= ',evt.target.value)
+    util.log(TAG,'onChangeUrl.value= ',evt.target.value)
     this.setState({entry:Object.assign({},this.state.entry,{
       url:evt.target.value
     })})
   }
   onChangeDescription(evt) {
-    console.log('onChangeDescription.value= ',evt.target.value)
+    util.log(TAG,'onChangeDescription.value= ',evt.target.value)
     this.setState({entry:Object.assign({},this.state.entry,{
       description:evt.target.value
     })})
   }
   onChangeUsername(evt) {
-    console.log('onChangeUsername.value= ',evt.target.value)
+    util.log(TAG,'onChangeUsername.value= ',evt.target.value)
     this.setState({entry:Object.assign({},this.state.entry,{
       username:evt.target.value
     })})
   }
   onChangePassword(evt) {
-    console.log('onChangePassword.value= ',evt.target.value)
+    util.log(TAG,'onChangePassword.value= ',evt.target.value)
     this.setState({entry:Object.assign({},this.state.entry,{
       password:evt.target.value
     })})
   }
   render() {
-    console.log('PasswordEntryForm.render: props=',this.props,' state=',this.state);
-    var state = this.state;
+    util.log(TAG,'render: props=',this.props,' state=',this.state)
+    const state = this.state;
     return (<div style={Model.getState().css.centerDiv}>
       <div>
       <FlatButton style={Model.getState().css.entryBackButton}
-          label="Back" onTouchStart={this.props.onBackTouched}/>
+          label="Back" onClick={this.props.onBackTouched}/>
       <FlatButton style={Model.getState().css.entrySaveButton}
-          label="Save" onTouchStart={this.onSaveTouched}/>
+          label="Save" onClick={this.onSaveTouched}/>
       </div>
       <TextField
         floatingLabelText="URL"
@@ -95,6 +98,7 @@ PasswordEntryForm = ReactRedux.connect(
   };
 },{
   onBackTouched:()=>{
+    util.log(TAG,'back touched');
     return {type:'CLEAR_ENTRY'};
   }
 })(PasswordEntryForm);

@@ -1,15 +1,17 @@
 require("babel-polyfill");
-var React = require('react');
-var ReactRedux = require('react-redux');
-var Redux = require('redux');
+const React = require('react');
+const ReactRedux = require('react-redux');
+const Redux = require('redux');
+const util = require('../util.js');
 
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
-
 import TextField from 'material-ui/lib/text-field';
 
 var Model = require('../models/Model.js');
 var PasswordEntryListForm = require('./PasswordEntryListForm.js')
+
+const TAG = 'components.PasswordEntryListControllerForm';
 
 class PasswordEntryListControllerForm extends React.Component {
   componentWillMount() {
@@ -17,15 +19,15 @@ class PasswordEntryListControllerForm extends React.Component {
     this.state = {searchValue:'',searchField:'url'}
   }
   searchFieldChange(evt,index,value) {
-    console.log(evt,index,value)
+    util.log(TAG,evt,index,value)
     this.setState({searchField:value})
   }
   searchValueChange(evt,index,value) {
-    console.log(evt,index,value)
+    util.log(TAG,evt,index,value)
     this.setState({searchValue:evt.target.value})
   }
   render() {
-    console.log('PasswordEntryListControllerForm.render: props=',this.props,' state=',this.state)
+    util.log(TAG,'render: props=',this.props,' state=',this.state)
     return (
       <div style={Model.getState().css.centerDiv}>
         <SelectField style={Model.getState().css.searchField}

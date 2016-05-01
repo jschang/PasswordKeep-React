@@ -1,7 +1,13 @@
 <?php
 
-define("SALT","78@3#~~~!712asdf383*45");
-define("KEY_STORE",__DIR__."/../../credentials.xml");
+define("PKR_SALT",
+  !empty($_SERVER['PKR_SALT'])
+  ? $_SERVER['PKR_SALT']
+  : "78@3#~~~!712asdf383*45" );
+define("PKR_CREDENTIALS_PATH",
+  !empty($_SERVER['PKR_CREDENTIALS_PATH'])
+  ? $_SERVER['PKR_CREDENTIALS_PATH']
+  : __DIR__."/../../credentials.xml" );
 
 require('../php/Cryptastic.php');
 require('../php/Credential.php');

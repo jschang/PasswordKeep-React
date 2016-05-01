@@ -1,4 +1,7 @@
-var redux = require('redux');
+const util = require('../util.js');
+const redux = require('redux');
+
+const TAG = 'models.Model';
 
 module.exports = redux.createStore(
   redux.combineReducers(
@@ -11,19 +14,21 @@ module.exports = redux.createStore(
        * { type: SET_STORE_PASSWORD, value: 'somevalue' }
        */
       key:function(state, action) {
-        console.log('model.key: state=',state,', action=',action)
-        if(!state) return {value:null};
+        util.log(TAG+'.key','state=',state,', action=',action)
+        if(!state) return {value:null,accepted:false};
         var ret = state;
         if(action.type=='SET_STORE_PASSWORD')
           ret = Object.assign({},state,{value:action.value});
-        console.log('model.key: new state=',ret)
+        if(action.type=='STORE_PASSWORD_ACCEPTED')
+          ret = Object.assign({},state,{accepted:true});
+        util.log(TAG+'.key','new state=',ret)
         return ret;
       },
-      /*
+      /**
        * { type: SERVICE_MESSAGE, message: 'message to display' }
        */
       serviceMessage:function(state, action) {
-        console.log('model.serviceMessage: state=',state,', action=',action)
+        util.log(TAG+'.serviceMessage','state=',state,', action=',action)
         if(!state) return '';
         var ret = state;
         if(action.type=='SERVICE_MESSAGE')
@@ -34,14 +39,14 @@ module.exports = redux.createStore(
        * { type: SET_FILTER, value: 'somevalue' }
        */
       filter:function(state, action) {
-        console.log('model.filter: state=',state,', action=',action);
+        util.log(TAG+'.filter','state=',state,', action=',action);
         if(!state) return '';
         if(action.type=='SET_FILTER')
           return action.value;
         return state;
       },
       entry:function(state, action) {
-        console.log('model.entry: state=',state,', action=',action);
+        util.log(TAG+'.entry','state=',state,', action=',action);
         if(!state) return {entry:null,index:null};
         if(action.type=='SET_ENTRY') {
           return {entry:action.entry,index:action.index};
@@ -58,7 +63,7 @@ module.exports = redux.createStore(
        * { type: EDIT_ENTRY, index: 2, entry: {username:null,password:null,description:null,url:null} }
        */
       entries:function(state, action) {
-        console.log('model.entries: state=',state,', action=',action);
+        util.log(TAG+'.entries','state=',state,', action=',action);
         if(!state) return [];
         if(action.type=='CLEAR_ENTRIES') {
           var ret = [];
