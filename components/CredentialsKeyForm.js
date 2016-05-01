@@ -37,10 +37,7 @@ CredentialsKeyForm = ReactRedux.connect(
 },{
   // map dispatchable events to props
   onEnterPressed: (evt) => {
-    return {
-      type:'SET_STORE_PASSWORD',
-      value:evt.target.value
-    }
+    return {type:'SET_STORE_PASSWORD',value:evt.target.value}
   }
 })(CredentialsKeyForm);
 

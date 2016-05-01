@@ -21,6 +21,8 @@ module.exports = redux.createStore(
           ret = Object.assign({},state,{value:action.value});
         if(action.type=='STORE_PASSWORD_ACCEPTED')
           ret = Object.assign({},state,{accepted:true});
+        if(action.type=='STORE_PASSWORD_REJECTED')
+          ret = Object.assign({},state,{accepted:false});
         util.log(TAG+'.key','new state=',ret)
         return ret;
       },
@@ -29,10 +31,14 @@ module.exports = redux.createStore(
        */
       serviceMessage:function(state, action) {
         util.log(TAG+'.serviceMessage','state=',state,', action=',action)
-        if(!state) return '';
+        if(state===null || typeof(state)=='undefined') return '';
         var ret = state;
-        if(action.type=='SERVICE_MESSAGE')
+        if(action.type=='SERVICE_MESSAGE') {
           ret = action.message;
+        }
+        if(action.type=='CLEAR_SERVICE_MESSAGE') {
+          ret = '';
+        }
         return ret;
       },
       /**
@@ -40,7 +46,7 @@ module.exports = redux.createStore(
        */
       filter:function(state, action) {
         util.log(TAG+'.filter','state=',state,', action=',action);
-        if(!state) return '';
+        if(!state) return 'url';
         if(action.type=='SET_FILTER')
           return action.value;
         return state;
