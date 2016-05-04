@@ -2,6 +2,8 @@ require("babel-polyfill");
 const React = require('react');
 const ReactRedux = require('react-redux');
 const Redux = require('redux');
+const Clipboard = require('clipboard');
+
 const util = require('../util.js');
 
 import Grid from 'react-bootstrap/lib/Grid';
@@ -17,6 +19,14 @@ import Panel from 'react-bootstrap/lib/Panel';
 const Model = require('../models/Model.js');
 
 const TAG = 'components.PasswordEntryListForm';
+
+const clipboard = new Clipboard('.copyable');
+clipboard.on('success', function(e) {
+  Model.dispatch({type:'SERVICE_MESSAGE',message:'Copied '+$(e.trigger).attr('data-type')+' to clipboard!'});
+});
+clipboard.on('error', function(e) {
+  Model.dispatch({type:'SERVICE_MESSAGE',message:'Unable to copy to clipboard.  =('});
+});
 
 class PasswordEntryListForm extends React.Component {
   componentWillMount() {
@@ -34,30 +44,53 @@ class PasswordEntryListForm extends React.Component {
   }
   
   render() {
+    
     util.log(TAG,'render: props=',this.props,' state=',this.state)
 
     var list = [];
     var props = this.props;
     var state = this.state;
     var self = this;
+    
     if(props.entries) {
-      props.entries.map(function(entry,index,entries) {
+      var entries = props.entries.slice()
+      entries.sort((l,r)=>{
+           if(l[props.searchField].toLowerCase() > r[props.searchField].toLowerCase()) {
+             return 1;
+           } else if(l[props.searchField].toLowerCase() < r[props.searchField].toLowerCase()) {
+             return -1;
+           }
+           return 0;
+      });
+      entries.map(function(entry,index,entries) {
         if(entry[props.searchField].match(props.searchValue)) {
           list.push(
             <Row key={'pwk_ei_'+index}>
               <Col xs={2}>
-                <Button style={{width:'100%'}} 
+                <Button style={{width:'100%',height:'100%'}} 
                     onClick={(evt)=>{self.handleUpdateSelectedIndex(evt,index)}}>
                   Edit
                 </Button>
               </Col>
-              <Col xs={8}>
-                <Panel>
+              <Col xs={2}>
+                <Button className={'copyable'} style={{width:'100%',height:'100%'}} 
+                    data-type="username" data-clipboard-text={entry.username}>
+                  Copy User
+                </Button>
+              </Col>
+              <Col xs={2}>
+                <Button className={'copyable'} style={{width:'100%',height:'100%'}} 
+                    data-type="password" data-clipboard-text={entry.password}>
+                  Copy Password
+                </Button>
+              </Col>
+              <Col xs={4}>
+                <Panel style={{overflow:'hidden'}}>
                   {entry[props.searchField]}
                 </Panel>
               </Col>
               <Col xs={2}>
-                <Button style={{width:'100%'}}
+                <Button style={{width:'100%',height:'100%'}}
                     onClick={(evt)=>{self.handleDelete(evt,index)}}>Delete</Button>
               </Col>
             </Row>

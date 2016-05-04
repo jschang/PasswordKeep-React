@@ -31,11 +31,21 @@ class PasswordAppForm extends React.Component {
     this.props.onCloseServiceMessage();
   }
   render() {
+    var centerStyle = {
+      position:'absolute',
+      top:'50%',
+      left:'50%',
+      marginTop:'-150px',
+      marginLeft:'-150px',
+      width:'300px',
+      zIndex:100,
+      top:window.pageYOffset+(window.innerHeight/3)
+    };
     util.log(TAG,'render: props=',this.props,' state=',this.state)
     var ret = [];
     if(this.props.serviceMessage.length>0) {
       ret.push(
-        <Alert key={'serviceMessage'} bsStyle={'warning'} closeLabel={'Close'}
+        <Alert style={centerStyle} key={'serviceMessage'} bsStyle={'warning'} closeLabel={'Close'}
             onDismiss={this.onCloseServiceMessage.bind(this)}>
           {this.props.serviceMessage}
         </Alert>
